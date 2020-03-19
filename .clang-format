@@ -11,7 +11,7 @@ ContinuationIndentWidth:         2
 Cpp11BracedListStyle:            false
 IndentCaseLabels:                false
 IndentWidth:                     4
-Language:                        C
+Language:                        Cpp
 NamespaceIndentation:            All
 PenaltyBreakAssignment:          100
 PointerAlignment:                Left
