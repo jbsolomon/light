@@ -1,5 +1,30 @@
 # Light
 
+########################################################################
+# CMake policies
+########################################################################
+
+cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
+
+# OLD: project() command manages VERSION variables.
+if(POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif(POLICY CMP0048)
+
+# OLD: target_sources() command converts relative paths to absolute.
+if(POLICY CMP0076)
+  cmake_policy(SET CMP0076 NEW)
+endif(POLICY CMP0076)
+
+# OLD: Targets need to be created in the same directory to be used.
+if(POLICY CMP0079)
+  cmake_policy(SET CMP0079 NEW)
+endif(POLICY CMP0079)
+
+########################################################################
+# CMake Project
+########################################################################
+
 project(Light
   VERSION 0.0.0.1
   DESCRIPTION "A lean, portable C89 graphics library"
@@ -7,51 +32,53 @@ project(Light
   LANGUAGES C
 )
 
-cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
+########################################################################
+# CMake setup
+########################################################################
 
-# # If Light is being built as a subtree in a CMake project, don't use
-# # CMake packaging tools.
-# set(LIGHT_IS_SUBTREE
-#   CACHE
-#   BOOL
-#   NO
-# )
+if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif(WIN32)
 
 set(LIGHT_DEV
   CACHE
   BOOL
-  NO
+  OFF
+  "Enable dev mode for Light."
 )
 
 set(LIGHT_BUILD_TESTS
   CACHE
   BOOL
   ${LIGHT_DEV}
+  "Enable tests for Light."
 )
 
 set(LIGHT_BUILD_SAMPLES
   CACHE
   BOOL
   ${LIGHT_DEV}
+  "Enable samples for Light."
 )
 
 set(LIGHT_INSTALL_DIR
   CACHE
   PATH
   ${CMAKE_INSTALL_PREFIX}
+  "The path where Light will be installed."
 )
 
-if(LIGHT_DEV)
+if($CACHE{LIGHT_DEV})
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-endif(LIGHT_DEV)
+endif($CACHE{LIGHT_DEV})
 
-if(LIGHT_BUILD_TESTS)
+if($CACHE{LIGHT_BUILD_TESTS})
   add_subdirectory(tests)
-endif(LIGHT_BUILD_TESTS)
+endif($CACHE{LIGHT_BUILD_TESTS})
 
-if(LIGHT_BUILD_SAMPLES)
+if($CACHE{LIGHT_BUILD_SAMPLES})
   add_subdirectory(samples)
-endif(LIGHT_BUILD_SAMPLES)
+endif($CACHE{LIGHT_BUILD_SAMPLES})
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 include(MacroEnsureOutOfSourceBuild)
@@ -106,9 +133,43 @@ write_basic_package_version_file(
   COMPATIBILITY SameMinorVersion
 )
 
+########################################################################
+# Targets
+########################################################################
+
+# light.h
+add_library(Light SHARED)
+target_sources(Light PUBLIC light.c)
+target_sources(Light INTERFACE light.h)
+target_include_directories(Light PUBLIC "${LIGHT_DIR}")
+
+set_property(TARGET Light PROPERTY C_STANDARD 90)
+set_property(TARGET Light PROPERTY C_STANDARD_REQUIRED ON)
+
+########################################################################
+# Installation
+########################################################################
+
+# Export files (shamelessly cribbed from SDL2)
+if (WINDOWS)
+  set(PKG_PREFIX "cmake")
+else ()
+  set(PKG_PREFIX "lib/cmake/light")
+endif ()
+
 install(
-  FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/LightConfig.cmake
-    ${CMAKE_BINARY_DIR}/LightConfigVersion.cmake
+  TARGETS
+    Light
+  EXPORT
+    Light
   DESTINATION ${PKG_PREFIX}
 )
+
+# install(EXPORT Light DESTINATION ${PKG_PREFIX})
+
+# install(
+#   FILES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/LightConfig.cmake
+#     ${CMAKE_BINARY_DIR}/LightConfigVersion.cmake
+#   DESTINATION ${PKG_PREFIX}
+# )
