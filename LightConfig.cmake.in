@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+# set(LIGHT_DIR "@PACKAGE_INSTALL_FULL_INCLUDEDIR@")
+set(LIGHT_DIR "@LIGHT_DIR@")
+set(LIGHT_INCLUDE_DIR "@LIGHT_INCLUDE_DIR@")
+# set(LIGHT_DATA_DIR    "/usr/local/" )
+
+#...logic to determine installedPrefix from the own location...
+# set(LIGHT_CONFIG_DIR  "${installedPrefix}/" )
