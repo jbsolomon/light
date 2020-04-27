@@ -38,6 +38,7 @@ project(Light
 
 if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  set(CXX_EXTENSIONS OFF)
 endif(WIN32)
 
 set(LIGHT_DEV
@@ -66,6 +67,19 @@ set(LIGHT_INSTALL_DIR
   PATH
   ${CMAKE_INSTALL_PREFIX}
   "The path where Light will be installed."
+)
+
+# set(SDL2_INSTALL_PREFIX
+#   CACHE
+#   PATH
+#   "The path where SDL2 is installed."
+# )
+
+set(VULKAN_INSTALL_PREFIX
+  CACHE
+  PATH
+  "$ENV{VULKAN_SDK}"
+  "(Optional) The path where SDL2 is installed."
 )
 
 if($CACHE{LIGHT_DEV})
@@ -134,6 +148,20 @@ write_basic_package_version_file(
 )
 
 ########################################################################
+# Dependencies
+########################################################################
+
+# We need SDL2 and Vulkan.  If the user already added them as targets,
+# great.  Otherwise, try to use find_package.
+if(NOT(TARGET SDL2))
+  find_package(SDL2 CONFIG REQUIRED)
+endif(NOT(TARGET SDL2))
+
+if(NOT(TARGET Vulkan::Headers))
+  find_package(Vulkan-Headers CONFIG REQUIRED)
+endif(NOT(TARGET Vulkan::Headers))
+
+########################################################################
 # Targets
 ########################################################################
 
@@ -142,6 +170,9 @@ add_library(Light SHARED)
 target_sources(Light PUBLIC light.c)
 target_sources(Light INTERFACE light.h)
 target_include_directories(Light PUBLIC "${LIGHT_DIR}")
+
+target_link_libraries(Light SDL2)
+target_link_libraries(Light Vulkan::Headers)
 
 set_property(TARGET Light PROPERTY C_STANDARD 90)
 set_property(TARGET Light PROPERTY C_STANDARD_REQUIRED ON)
