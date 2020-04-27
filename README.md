@@ -21,8 +21,15 @@ Light is written in portable ANSI C and uses Vulkan.
 
 ## Dependencies
 
-Light depends on SDL2 to create a Vulkan pipeline.  Please make sure
-your library or executable is linked with SDL 2.0.12 or greater.
+Light depends on
+[Vulkan-Headers](https://github.com/phoenix-engine/Vulkan-Headers)
+and a native surface API, such as the one provided by SDL2 through the
+SDL [Light Cell](https://github.com/phoenix-engine/light-cells).
+
+You can install these dependencies on your system, drop them in as local
+files in your project, or add them as Git submodules in a CMake build as
+shown in
+[Light Samples](https://github.com/phoenix-engine/light-samples).
 
 ## Samples
 
